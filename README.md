@@ -37,3 +37,4 @@ The app works as a test bench for tecniches and resouces of Fluuter and Realtime
 - Correction of Minor bugs on refresh in main screen
 - Installment bills
 - Local cache data so the app could work offline
+- Custom theme
