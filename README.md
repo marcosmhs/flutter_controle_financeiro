@@ -1,22 +1,22 @@
-# Fin - Finanças pessoais
+# Fin - Personal finances
 
-Este App permite que você controle seus gastos pessoais.
+This app allow you to control your personal finances by registering your earns and expenses.
 
-Ele funciona como um grande teste para recursos e técnicas de desenvolviment com Flutter e Realtime databse (Firebase). 
+The app works as a test bench for tecniches and resouces of Fluuter and Realtime database (Firebase). 
 
-## Components customizados
+## Customized components
 - Textfield
 - Dialog
-- Snakbar/Toast
+- Snackbar/Toast
 - DropBox
 
-## Classes genéricas
-- Troca de mensagens entre classes
-- Gerador de Uid
-- Scafold
+## Main classes
+- Message exchange
+- Guid generator
+- Scaffold
 - Modal Form
 
-## Algumas imagens
+## A few images
 <center>
 <table>
 <tr>
@@ -33,7 +33,7 @@ Ele funciona como um grande teste para recursos e técnicas de desenvolviment co
 </table>
 </center>
 
-## Próximos passos
-- Correção de pequenos bugs na atualização de dados
-- Tela de parcelamento
-- Armazenamento de dados em cache local
+## Next steps
+- Correction of Minor bugs on refresh in main screen
+- Installment bills
+- Local cache data so the app could work offline
