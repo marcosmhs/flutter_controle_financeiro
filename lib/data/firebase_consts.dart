@@ -18,6 +18,10 @@ class FirebaseConsts {
     return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/entry';
   }
 
+  static String get entryInstallment {
+    return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/entryInstallment';
+  }
+
   static String get entryPayment {
     return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/entryPayment';
   }

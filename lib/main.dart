@@ -1,3 +1,4 @@
+import 'package:fin/my_theme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fin/controllers/auth_controller.dart';
@@ -68,10 +69,7 @@ class _MyAppState extends State<MyApp> {
           Locale('pt', 'BR'), // English
         ],
         title: 'Fin',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
+        theme: MyTheme.theme,
         routes: {
           FinRoutes.landing: (ctx) => const Landing(),
           FinRoutes.authScreen: (ctx) => const AuthScreen(screenMode: ScreenMode.signIn),

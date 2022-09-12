@@ -55,6 +55,8 @@ class Entry {
   DateTime? date;
   DateTime? expiratioDate;
   List<EntryPayment>? entryPaymentList;
+  String entryInstallmentId;
+  EntryInstallment? entryInstallment;
 
   Entry({
     this.id = '',
@@ -65,6 +67,8 @@ class Entry {
     this.date,
     this.expiratioDate,
     this.entryPaymentList,
+    this.entryInstallmentId = '',
+    this.entryInstallment,
   });
 
   double get payedValue {
@@ -122,5 +126,17 @@ class EntryPayment {
     required this.entryId,
     required this.value,
     required this.date,
+  });
+}
+
+class EntryInstallment {
+  String id;
+  DateTime? date;
+  int installmentQuantity;
+
+  EntryInstallment({
+    this.id = '',
+    this.date,
+    this.installmentQuantity = 0,
   });
 }

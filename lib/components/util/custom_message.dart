@@ -17,6 +17,7 @@ class CustomMessage {
     IconData? icon,
     Color? backgroundColor,
     Color? textColor,
+    double toastFixedHeight = 70,
   }) {
     IconData iconImage;
     Color bkgColor;
@@ -31,9 +32,7 @@ class CustomMessage {
     if (backgroundColor != null) {
       bkgColor = backgroundColor;
     } else {
-      bkgColor = messageType == MessageType.error
-          ? Theme.of(context).colorScheme.error
-          : Theme.of(context).colorScheme.primary;
+      bkgColor = messageType == MessageType.error ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary;
     }
 
     if (icon != null) {
@@ -82,7 +81,8 @@ class CustomMessage {
           ),
           alignment: Alignment.center,
           constraints: BoxConstraints(
-            maxHeight: 100,
+            minHeight: toastFixedHeight,
+            maxHeight: toastFixedHeight,
             maxWidth: MediaQuery.of(context).size.width - 30,
             minWidth: MediaQuery.of(context).size.width - 30,
           ),

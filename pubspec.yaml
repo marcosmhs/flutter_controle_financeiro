@@ -32,8 +32,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter    
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0    
+  #hive: ^2.2.3
+  #hive_flutter: ^1.1.0    
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -48,10 +48,11 @@ dev_dependencies:
   shared_preferences: ^2.0.15 #armazenamento local 
   flutter_colorpicker: ^1.0.3 # seleçãod e cores
   fluttertoast: ^8.0.9 # exibidor de mensagens
-  connectivity_plus: ^2.3.6+1 # verifica conectigidade do celular
-  hive_generator: ^1.1.3 # necessário para HIVE
-  build_runner: ^1.3.1 # necessário para HIVE
+  #connectivity_plus: ^2.3.6+1 # verifica conectigidade do celular
+  #hive_generator: ^1.1.3 # necessário para HIVE
+  #build_runner: ^1.3.1 # necessário para HIVE
   nanoid: ^1.0.0 #gerador de UIDs
+  floating_action_bubble: ^1.1.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

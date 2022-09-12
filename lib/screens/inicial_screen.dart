@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 import '../components/fin_scafold.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+// ignore: depend_on_referenced_packages
+import 'package:floating_action_bubble/floating_action_bubble.dart';
 
 class InicialScreen extends StatefulWidget {
   const InicialScreen({Key? key}) : super(key: key);
@@ -20,10 +22,12 @@ class InicialScreen extends StatefulWidget {
   State<InicialScreen> createState() => _InicialScreenState();
 }
 
-class _InicialScreenState extends State<InicialScreen> {
-  late List<Entry> entryList = [];
+class _InicialScreenState extends State<InicialScreen> with SingleTickerProviderStateMixin {
+  late List<Entry> _entryList = [];
   late List<CustomDropBoxData> _dropBoxData = [];
   bool _isLoading = true;
+
+  late AnimationController _animationController;
 
   CustomDropBoxData _monthYearFilter = CustomDropBoxData(
     id: DateFormat('MM/yyyy').format(DateTime.now()),
@@ -32,7 +36,12 @@ class _InicialScreenState extends State<InicialScreen> {
   );
 
   @override
-  initState() {
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+
     super.initState();
     _refreshEntryList();
   }
@@ -42,15 +51,61 @@ class _InicialScreenState extends State<InicialScreen> {
     super.dispose();
   }
 
-  void _openModalForm({required BuildContext context, Entry? entry}) {
+  void _openModalFormNewEntry({required BuildContext context, Entry? entry, bool showInstallment = false}) {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
       elevation: 5,
       builder: (_) {
-        return EntryForm(entry: entry);
+        return EntryForm(entry: entry, showInstallment: showInstallment);
       },
     ).then((value) => _refreshEntryList());
+  }
+
+  Widget _newEntryOptions({required BuildContext context}) {
+    return FloatingActionBubble(
+      items: <Bubble>[
+        Bubble(
+          title: "Novo lançamento",
+          iconColor: Colors.black,
+          bubbleColor: Theme.of(context).primaryColor,
+          icon: Icons.add_box,
+          titleStyle: const TextStyle(fontSize: 16),
+          onPress: () {
+            _animationController.reverse();
+            _openModalFormNewEntry(context: context, showInstallment: false);
+          },
+        ),
+        //Floating action menu item
+        Bubble(
+          title: "Novo lançamento parcelado",
+          iconColor: Colors.black,
+          bubbleColor: Theme.of(context).primaryColor,
+          icon: Icons.home,
+          titleStyle: const TextStyle(fontSize: 16),
+          onPress: () {
+            _animationController.reverse();
+            _openModalFormNewEntry(context: context, showInstallment: true);
+          },
+        ),
+      ],
+
+      // animation controller
+      animation: Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(
+          curve: Curves.easeInOut,
+          parent: _animationController,
+        ),
+      ),
+
+      // On pressed change animation state
+      onPress: () => _animationController.isCompleted ? _animationController.reverse() : _animationController.forward(),
+
+      // Floating Action button Icon color
+      iconColor: Theme.of(context).primaryColor,
+      iconData: Icons.add_circle,
+      backGroundColor: Colors.white,
+    );
   }
 
   Future<void> _refreshEntryList() async {
@@ -66,7 +121,7 @@ class _InicialScreenState extends State<InicialScreen> {
         );
       }
       _dropBoxData = entryController.periodListData;
-      entryList = entryController.entryListByDate(monthYear: _monthYearFilter.id);
+      setState(() => _entryList = entryController.entryListByDate(monthYear: _monthYearFilter.id));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -90,6 +145,7 @@ class _InicialScreenState extends State<InicialScreen> {
       ],
       body: Column(
         children: [
+          // receitas e despesas
           RefreshIndicator(
             onRefresh: _refreshEntryList,
             child: Card(
@@ -105,7 +161,7 @@ class _InicialScreenState extends State<InicialScreen> {
                       context: context,
                       onClose: (value) {
                         setState(() => _monthYearFilter = value);
-                        entryList = entryController.entryListByDate(monthYear: _monthYearFilter.id);
+                        _entryList = entryController.entryListByDate(monthYear: _monthYearFilter.id);
                       },
                       data: _dropBoxData,
                       inicialValue: _dropBoxData.isEmpty ? null : _dropBoxData[0],
@@ -168,13 +224,14 @@ class _InicialScreenState extends State<InicialScreen> {
               ),
             ),
           ),
+          // lista de lançamentos
           SizedBox(
             height: screenHeigth * 0.65,
             child: SingleChildScrollView(
               physics: const ScrollPhysics(),
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator.adaptive())
-                  : entryList.isEmpty
+                  : _entryList.isEmpty
                       ? Center(
                           child: Flexible(
                             child: Padding(
@@ -188,22 +245,21 @@ class _InicialScreenState extends State<InicialScreen> {
                           ),
                         )
                       : ListView.builder(
-                          itemCount: entryList.length,
+                          itemCount: _entryList.length,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemBuilder: (ctx, index) {
-                            return EntryCard(entry: entryList[index]);
+                            return EntryCard(
+                              entry: _entryList[index],
+                              refreshMethod: _refreshEntryList,
+                            );
                           },
                         ),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openModalForm(context: context),
-        mini: false,
-        child: const Icon(Icons.add_box),
-      ),
+      floatingActionButton: _newEntryOptions(context: context),
     );
   }
 }

@@ -6,7 +6,7 @@ class FinScafold extends StatelessWidget {
   final String title;
   final bool showAppDrawer;
   final List<Widget>? appBarActions;
-  final FloatingActionButton? floatingActionButton;
+  final Widget? floatingActionButton;
   final Color? backgroundColor;
 
   const FinScafold({

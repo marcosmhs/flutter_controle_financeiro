@@ -16,6 +16,7 @@ class CustomTextEdit extends StatefulWidget {
   final IconData? prefixIcon;
   final String? Function(String?)? validator;
   final void Function(String?)? onSave;
+  final void Function(String?)? onChanged;
   final InputBorder? border;
   final void Function()? onTap;
 
@@ -35,6 +36,7 @@ class CustomTextEdit extends StatefulWidget {
     this.prefixIcon,
     this.validator,
     this.onSave,
+    this.onChanged,
     this.border,
     this.onTap,
   }) : super(key: key);
@@ -57,10 +59,10 @@ class _CustomTextEditState extends State<CustomTextEdit> {
             enabled: widget.enabled,
             obscureText: !widget.isPassword ? false : _hidePassword,
             // use text editor only if keyboardType wasn´t set.
-            keyboardType: widget.isPassword && widget.keyboardType == null
-                ? TextInputType.text
-                : widget.keyboardType ?? TextInputType.text,
+            keyboardType:
+                widget.isPassword && widget.keyboardType == null ? TextInputType.text : widget.keyboardType ?? TextInputType.text,
             onSaved: widget.onSave,
+            onChanged: widget.onChanged,
             initialValue: widget.inicialValue,
             textInputAction: widget.textInputAction,
             onFieldSubmitted:

@@ -60,7 +60,7 @@ class _EntryPaymentComponentState extends State<EntryPaymentComponent> {
           retorno = await entryController.registerPayment(entryPayment: entryPayment);
           if (retorno.returnType == ReturnType.sucess) {
             // ignore: use_build_context_synchronously
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
             CustomMessage(
               context: context,
               modelType: ModelType.toast,
@@ -144,7 +144,7 @@ class _EntryPaymentComponentState extends State<EntryPaymentComponent> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               ElevatedButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () => Navigator.of(context).pop(false),
                                 child: const Text('Voltar'),
                               ),
                               const SizedBox(width: 20),

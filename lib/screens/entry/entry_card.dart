@@ -10,7 +10,9 @@ class EntryCard extends StatefulWidget {
   final Entry entry;
   final double fixedHeight;
   final bool useSwipe;
-  const EntryCard({Key? key, required this.entry, this.fixedHeight = 0, this.useSwipe = true}) : super(key: key);
+  final void Function()? refreshMethod;
+  const EntryCard({Key? key, required this.entry, this.refreshMethod, this.fixedHeight = 0, this.useSwipe = true})
+      : super(key: key);
 
   @override
   State<EntryCard> createState() => _EntryCardState();
@@ -31,7 +33,13 @@ class _EntryCardState extends State<EntryCard> {
         builder: (_) {
           return EntryForm(entry: widget.entry);
         },
-      );
+      ).then((value) {
+        if (value) {
+          if (widget.refreshMethod != null) {
+            widget.refreshMethod;
+          }
+        }
+      });
     } else {
       bool? openModal = true;
       if (widget.entry.value == widget.entry.payedValue) {
@@ -47,7 +55,13 @@ class _EntryCardState extends State<EntryCard> {
           builder: (_) {
             return EntryPaymentComponent(entry: widget.entry);
           },
-        );
+        ).then((value) {
+          if (value) {
+            if (widget.refreshMethod != null) {
+              widget.refreshMethod;
+            }
+          }
+        });
       }
     }
     return false;

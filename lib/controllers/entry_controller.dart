@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:fin/components/util/custom_dropbox.dart';
 import 'package:fin/components/util/custom_return.dart';
@@ -20,7 +21,9 @@ class EntryController with ChangeNotifier {
   EntryController(this.currentUserData, this._entryList);
 
   List<Entry> get entryList => [..._entryList];
-  List<EntryPayment> get entryListPayment => [..._entryPaymentList];
+  //List<EntryPayment> get entryPaymentList => [..._entryPaymentList];
+
+  // Entry Geters
 
   double totalEntryValue({String monthYear = ''}) {
     if (monthYear == '') {
@@ -111,30 +114,7 @@ class EntryController with ChangeNotifier {
     return data;
   }
 
-  Future<CustomReturn> registerPayment({required EntryPayment entryPayment}) async {
-    final response = await post(
-      // http.post
-      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
-      // Id fica em branco pois será gerado no banco
-      body: jsonEncode({
-        'date': entryPayment.date.toIso8601String(),
-        'entryId': entryPayment.entryId,
-        'value': entryPayment.value.toString(),
-      }),
-    );
-
-    if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
-    }
-
-    String id = jsonDecode(response.body)['name'];
-    if (id.isEmpty) {
-      return CustomReturn(returnType: ReturnType.error, message: 'Erro interno ao tentar salvar.');
-    }
-
-    notifyListeners();
-    return CustomReturn.sucess;
-  }
+  // Entry CRUD
 
   Future<CustomReturn> save({required Entry entry}) async {
     if (entry.entryType == null) {
@@ -179,32 +159,55 @@ class EntryController with ChangeNotifier {
   }
 
   Future<CustomReturn> _addEntry({required Entry entry}) async {
-    final response = await post(
-      // http.post
-      Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
-      // Id fica em branco pois será gerado no banco
-      body: jsonEncode({
-        'description': entry.description,
-        'entryExpenseIncome': entry.entryExpenseIncome,
-        'value': entry.value,
-        'date': entry.date?.toIso8601String(),
-        'expiratioDate': entry.expiratioDate?.toIso8601String(),
-        'entryTypeId': entry.entryType!.id,
-      }),
-    );
-
-    if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
-    } else {
-      String id = jsonDecode(response.body)['name'];
-      if (id.isEmpty) {
-        return CustomReturn(returnType: ReturnType.error, message: 'Erro interno ao tentar salvar.');
-      } else {
-        entry.id = id;
-        _entryList.add(entry);
-        notifyListeners();
+    int installmentQuantity = 1;
+    String entryInstallmentId = '';
+    double value = entry.value;
+    DateTime? expiratioDate = entry.expiratioDate;
+    // toda adição de pagamentos depende de um parcelamento.
+    // se o usuário criou um lançamento simples será gerada apenas uma parcela
+    // se ele informou parcelas será criada a tabela de controle de parcelas e ela será vinculada ao lançamento.
+    if (entry.entryInstallment != null && entry.entryInstallment!.installmentQuantity >= 2) {
+      var result = await _addEntryInstallment(entryInstallment: entry.entryInstallment!);
+      CustomReturn customReturn = result.first as CustomReturn;
+      if (customReturn.returnType == ReturnType.sucess) {
+        EntryInstallment entryInstallment = result.last as EntryInstallment;
+        installmentQuantity = entryInstallment.installmentQuantity;
+        entryInstallmentId = entryInstallment.id;
+        value = value / installmentQuantity;
       }
     }
+
+    for (var x = 1; x <= installmentQuantity; x++) {
+      expiratioDate = expiratioDate?.add(Duration(days: 30 * x - 1));
+      final response = await post(
+        // http.post
+        Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+        // Id fica em branco pois será gerado no banco
+        body: jsonEncode({
+          'description': '${entry.description} ${installmentQuantity == 1 ? '' : "$x / $installmentQuantity"}',
+          'entryExpenseIncome': entry.entryExpenseIncome,
+          'value': value,
+          'date': entry.date?.toIso8601String(),
+          'expiratioDate': expiratioDate?.toIso8601String(),
+          'entryTypeId': entry.entryType!.id,
+          'entryInstallmentId': entryInstallmentId,
+        }),
+      );
+
+      if (response.statusCode >= 400) {
+        return CustomReturn.httpError(errorCode: response.statusCode);
+      } else {
+        String id = jsonDecode(response.body)['name'];
+        if (id.isEmpty) {
+          return CustomReturn(returnType: ReturnType.error, message: 'Erro interno ao tentar salvar.');
+        } else {
+          entry.id = id;
+          _entryList.add(entry);
+          notifyListeners();
+        }
+      }
+    }
+
     return CustomReturn.sucess;
   }
 
@@ -212,6 +215,11 @@ class EntryController with ChangeNotifier {
     if (_entryList.indexWhere((e) => e.id == entry.id) == -1) {
       return CustomReturn(returnType: ReturnType.error, message: 'Erro interno, lançamento não encontrado');
     }
+
+    if ((await entryPaymentList(entryId: entry.id)).isNotEmpty) {
+      return CustomReturn(returnType: ReturnType.error, message: 'Este lançamento possui pagamentos e não pode ser excluído');
+    }
+
     final response = await delete(
       // http.delete
       Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}/${entry.id}.json?auth=${currentUserData.token}'),
@@ -271,6 +279,79 @@ class EntryController with ChangeNotifier {
     }
   }
 
+  Future<Set<dynamic>> _addEntryInstallment({required EntryInstallment entryInstallment}) async {
+    CustomReturn customReturn = CustomReturn.sucess;
+    final response = await post(
+      // http.post
+      Uri.parse('${FirebaseConsts.entryInstallment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      // Id fica em branco pois será gerado no banco
+      body: jsonEncode({
+        'installmentQuantity': entryInstallment.installmentQuantity,
+        'date': entryInstallment.date?.toIso8601String(),
+      }),
+    );
+
+    if (response.statusCode >= 400) {
+      customReturn = CustomReturn.httpError(errorCode: response.statusCode);
+    } else {
+      String id = jsonDecode(response.body)['name'];
+      if (id.isEmpty) {
+        customReturn = CustomReturn(returnType: ReturnType.error, message: 'Erro interno ao tentar salvar.');
+      } else {
+        entryInstallment.id = id;
+      }
+    }
+
+    return {customReturn, entryInstallment};
+  }
+
+  // Entry Payment
+
+  Future<CustomReturn> registerPayment({required EntryPayment entryPayment}) async {
+    final response = await post(
+      // http.post
+      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      // Id fica em branco pois será gerado no banco
+      body: jsonEncode({
+        'date': entryPayment.date.toIso8601String(),
+        'entryId': entryPayment.entryId,
+        'value': entryPayment.value.toString(),
+      }),
+    );
+
+    if (response.statusCode >= 400) {
+      return CustomReturn.httpError(errorCode: response.statusCode);
+    }
+
+    String id = jsonDecode(response.body)['name'];
+    if (id.isEmpty) {
+      return CustomReturn(returnType: ReturnType.error, message: 'Erro interno ao tentar salvar.');
+    }
+
+    notifyListeners();
+    return CustomReturn.sucess;
+  }
+
+  Future<CustomReturn> removeEntryPayment({required EntryPayment entryPayment}) async {
+    if (_entryPaymentList.indexWhere((e) => e.id == entryPayment.id) == -1) {
+      return CustomReturn(returnType: ReturnType.error, message: 'Erro interno, pagamento não encontrado');
+    }
+
+    final response = await delete(
+      // http.delete
+      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}/${entryPayment.id}.json?auth=${currentUserData.token}'),
+    );
+
+    if (response.statusCode >= 400) {
+      return CustomReturn.httpError(errorCode: response.statusCode);
+    } else {
+      _entryPaymentList.removeWhere((e) => e.id == entryPayment.id);
+      // retorna à todos os que estão ouvindo esta classe sejam notificados
+      notifyListeners();
+    }
+    return CustomReturn.sucess;
+  }
+
   Future<CustomReturn> loadEntryListPayment() async {
     final response = await get(
       Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
@@ -297,5 +378,10 @@ class EntryController with ChangeNotifier {
       _entryPaymentList.add(entryPayment);
     }
     return CustomReturn.sucess;
+  }
+
+  Future<List<EntryPayment>> entryPaymentList({required String entryId}) async {
+    await loadEntryListPayment();
+    return _entryPaymentList.where((e) => e.entryId == entryId).toList();
   }
 }
