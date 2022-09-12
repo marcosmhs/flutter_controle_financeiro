@@ -1,16 +1,40 @@
-# fin
+# Fin - Personal finances
 
-Fin - Finanças pessoais
+This app allow you to control your personal finances by registering your earns and expenses.
 
-## Getting Started
+The app works as a test bench for tecniches and resouces of Fluuter and Realtime database (Firebase). 
 
-This project is a starting point for a Flutter application.
+## Customized components
+- Textfield
+- Dialog
+- Snackbar/Toast
+- DropBox
 
-A few resources to get you started if this is your first Flutter project:
+## Main classes
+- Message exchange
+- Guid generator
+- Scaffold
+- Modal Form
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## A few images
+<center>
+<table>
+<tr>
+<td>
+<img src="tela_principal.jpg" width="250">
+</td>
+<td>
+<img src="tipo_lancamento.jpg" width="250"> 
+</td>
+<td>
+<img src="pagamento.jpg" width="250">
+</td>
+</tr>
+</table>
+</center>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Next steps
+- Correction of Minor bugs on refresh in main screen
+- Installment bills
+- Local cache data so the app could work offline
+- Custom theme
