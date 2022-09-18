@@ -41,7 +41,7 @@ class ScreenNotFound extends StatelessWidget {
           // limpa a stak de telas e chama a tela inicial
           Navigator.restorablePushNamedAndRemoveUntil(
             context,
-            FinRoutes.inicialScreen,
+            FinRoutes.mainScreen,
             (route) => false,
           );
         },

@@ -21,10 +21,8 @@ class EntryController with ChangeNotifier {
   EntryController(this.currentUserData, this._entryList);
 
   List<Entry> get entryList => [..._entryList];
-  //List<EntryPayment> get entryPaymentList => [..._entryPaymentList];
 
   // Entry Geters
-
   double totalEntryValue({String monthYear = ''}) {
     if (monthYear == '') {
       return _entryList.fold(0, (total, entry) => total + entry.value);

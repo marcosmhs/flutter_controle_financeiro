@@ -46,7 +46,7 @@ class _SignInComponentState extends State<SignInComponent> {
           // ignore: use_build_context_synchronously
           Navigator.restorablePushNamedAndRemoveUntil(
             context,
-            FinRoutes.inicialScreen,
+            FinRoutes.mainScreen,
             (route) => false,
           );
         }

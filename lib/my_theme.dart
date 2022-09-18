@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 class MyTheme {
   static ThemeData get theme {
-    late var accent = Color.fromARGB(181, 111, 58, 211);
-    //late var accentSecond = const Color.fromARGB(255, 121, 72, 0);
+    late var accent = const Color.fromARGB(181, 111, 58, 211);
+    late var accentSecond = const Color.fromARGB(181, 164, 157, 173);
     return ThemeData(
       primarySwatch: Colors.deepPurple,
       primaryColor: accent,
-      scaffoldBackgroundColor: Colors.grey[200],
+      scaffoldBackgroundColor: Colors.grey[100],
       backgroundColor: Colors.white,
       dividerColor: accent,
-      disabledColor: Colors.grey[200],
+      disabledColor: accentSecond,
       iconTheme: IconThemeData(color: accent),
       textTheme: TextTheme(headline3: TextStyle(color: accent)),
       //bottomSheetTheme: BottomSheetThemeData(

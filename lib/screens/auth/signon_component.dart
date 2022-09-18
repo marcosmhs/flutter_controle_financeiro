@@ -57,7 +57,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
             // ignore: use_build_context_synchronously
             Navigator.restorablePushNamedAndRemoveUntil(
               context,
-              FinRoutes.landing,
+              FinRoutes.landingScreen,
               (route) => false,
             );
             CustomMessage(
@@ -92,7 +92,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
               // ignore: use_build_context_synchronously
               Navigator.restorablePushNamedAndRemoveUntil(
                 context,
-                FinRoutes.landing,
+                FinRoutes.landingScreen,
                 (route) => false,
               );
             }

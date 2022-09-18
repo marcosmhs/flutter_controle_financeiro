@@ -146,7 +146,7 @@ class AuthController with ChangeNotifier {
         if (localExpiredDate.isBefore(DateTime.now())) {
           final authLoginPassword = await SharedPreferencesController.loadMap(key: 'authLoginPassword');
           if (authLoginPassword.isNotEmpty) {
-            await signIn(email: authLoginPassword['email'], password: authLoginPassword['pwd']);
+            await signIn(email: authLoginPassword['email'], password: authLoginPassword['pwd'], saveLogin: true);
           }
         } else {
           // recria o objeto de autenticação

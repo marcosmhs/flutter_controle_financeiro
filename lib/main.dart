@@ -1,21 +1,22 @@
-import 'package:fin/my_theme.dart';
 import 'package:flutter/material.dart';
-
-import 'package:fin/controllers/auth_controller.dart';
-import 'package:fin/controllers/entry_controller.dart';
-import 'package:fin/controllers/entrytype_controller.dart';
-import 'package:fin/screens/landing.dart';
-
-import 'package:fin/screens/screen_not_found.dart';
-import 'package:fin/screens/auth/auth_screen.dart';
-import 'package:fin/screens/auth/user_data_screen.dart';
-import 'package:fin/screens/entrytype/entrytype_screen.dart';
-import 'package:fin/screens/inicial_screen.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:fin/fin_routes.dart';
+import 'package:fin/my_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:fin/controllers/auth_controller.dart';
+import 'package:fin/controllers/entry_controller.dart';
+import 'package:fin/controllers/entrytype_controller.dart';
+
+import 'package:fin/screens/landing_screen.dart';
+import 'package:fin/screens/main_screen.dart';
+import 'package:fin/screens/screen_not_found.dart';
+import 'package:fin/screens/auth/auth_screen.dart';
+import 'package:fin/screens/auth/user_data_screen.dart';
+import 'package:fin/screens/entrytype/entrytype_screen.dart';
+
 
 void main() async {
   runApp(const MyApp());
@@ -71,13 +72,13 @@ class _MyAppState extends State<MyApp> {
         title: 'Fin',
         theme: MyTheme.theme,
         routes: {
-          FinRoutes.landing: (ctx) => const Landing(),
+          FinRoutes.landingScreen: (ctx) => const LandingScreen(),
           FinRoutes.authScreen: (ctx) => const AuthScreen(screenMode: ScreenMode.signIn),
-          FinRoutes.inicialScreen: (ctx) => const InicialScreen(),
+          FinRoutes.mainScreen: (ctx) => const MainScreen(),
           FinRoutes.userDataScreen: (ctx) => const UserDataScreen(),
           FinRoutes.entryTypeScreen: (ctx) => const EntryTypeScreen(),
         },
-        initialRoute: FinRoutes.landing,
+        initialRoute: FinRoutes.landingScreen,
         // Executado quando uma tela não é encontrada
         onUnknownRoute: (settings) {
           return MaterialPageRoute(builder: (_) {

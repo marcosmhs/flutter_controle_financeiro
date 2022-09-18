@@ -14,6 +14,7 @@ class CustomTextEdit extends StatefulWidget {
   final FocusNode? nextFocusNode;
   final FocusNode? focusNode;
   final IconData? prefixIcon;
+  final Color? fillColor;
   final String? Function(String?)? validator;
   final void Function(String?)? onSave;
   final void Function(String?)? onChanged;
@@ -30,6 +31,7 @@ class CustomTextEdit extends StatefulWidget {
     this.isPassword = false,
     this.inicialValue,
     this.textInputAction = TextInputAction.next,
+    this.fillColor,
     this.keyboardType,
     this.nextFocusNode,
     this.focusNode,
@@ -71,6 +73,8 @@ class _CustomTextEditState extends State<CustomTextEdit> {
             validator: widget.validator,
             controller: widget.controller,
             decoration: InputDecoration(
+              filled: true,
+              fillColor: widget.fillColor ?? Theme.of(context).backgroundColor,
               prefixIcon: widget.prefixIcon == null ? null : Icon(widget.prefixIcon),
               // set if password should be visible
               suffixIcon: !widget.isPassword

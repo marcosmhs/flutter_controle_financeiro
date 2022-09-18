@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:fin/controllers/auth_controller.dart';
-import 'package:fin/screens/inicial_screen.dart';
+import 'package:fin/screens/main_screen.dart';
 
-class Landing extends StatelessWidget {
-  const Landing({Key? key}) : super(key: key);
+class LandingScreen extends StatelessWidget {
+  const LandingScreen({Key? key}) : super(key: key);
 
   Widget _autoLogin() {
     
@@ -26,7 +26,7 @@ class Landing extends StatelessWidget {
         } else {
           return authController.currentUserData.isAuthenticated == false
               ? _autoLogin()
-              : const InicialScreen();
+              : const MainScreen();
         }
       },
     );

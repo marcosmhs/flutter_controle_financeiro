@@ -79,7 +79,7 @@ class FinDrawer extends StatelessWidget {
               Provider.of<AuthController>(context, listen: false).logout();
               Navigator.restorablePushNamedAndRemoveUntil(
                 context,
-                FinRoutes.landing,
+                FinRoutes.landingScreen,
                 (route) => false,
               );
             },

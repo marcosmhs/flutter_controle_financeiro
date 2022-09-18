@@ -51,7 +51,7 @@ class _EntryFormState extends State<EntryForm> with SingleTickerProviderStateMix
     super.initState();
     localEntry = widget.entry ?? localEntry;
     _entryDescriptionController.text = localEntry.description;
-    _entryValueController.text = localEntry.value.toString();
+    _entryValueController.text = localEntry.value == 0 ? '' : localEntry.value.toString();
     _entryTypeError = false;
     _incomeExpenseError = false;
   }
