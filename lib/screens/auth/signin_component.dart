@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:fin/controllers/auth_controller.dart';
-import 'package:fin/fin_routes.dart';
+import 'package:fin/routes.dart';
 import 'package:fin/screens/auth/auth_screen.dart';
 
 enum TextFieldType { email, password }
@@ -46,7 +46,7 @@ class _SignInComponentState extends State<SignInComponent> {
           // ignore: use_build_context_synchronously
           Navigator.restorablePushNamedAndRemoveUntil(
             context,
-            FinRoutes.mainScreen,
+            Routes.mainScreen,
             (route) => false,
           );
         }
@@ -124,7 +124,7 @@ class _SignInComponentState extends State<SignInComponent> {
                     const SizedBox(width: 20),
                     // criar nova conta
                     TextButton.icon(
-                      onPressed: () => Navigator.of(context).pushNamed(FinRoutes.authScreen, arguments: ScreenMode.signOn),
+                      onPressed: () => Navigator.of(context).pushNamed(Routes.authScreen, arguments: ScreenMode.signOn),
                       //style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.secondary)),
                       icon: const Icon(Icons.account_box),
                       label: Padding(

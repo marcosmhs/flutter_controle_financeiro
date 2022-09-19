@@ -1,4 +1,4 @@
-import 'package:fin/components/fin_modalscafold.dart';
+import 'package:fin/components/util/custom_modalscafold.dart';
 import 'package:fin/components/util/custom_textFormField.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
@@ -94,8 +94,7 @@ class _EntryTypeFormState extends State<EntryTypeForm> {
           Center(
             child: ToggleButtons(
               isSelected: _selectedType,
-              fillColor:
-                  localEntryType.colorValue == 0 ? Theme.of(context).primaryColor : Color(localEntryType.colorValue),
+              fillColor: localEntryType.colorValue == 0 ? Theme.of(context).primaryColor : Color(localEntryType.colorValue),
               selectedColor: Colors.black,
               onPressed: (index) {
                 _showCollorPicker(context);
@@ -144,9 +143,31 @@ class _EntryTypeFormState extends State<EntryTypeForm> {
     );
   }
 
+  Future<dynamic> _showCollorPicker(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Selecione a cor tipo de lançamento'),
+          content: SingleChildScrollView(
+            child: BlockPicker(
+              pickerColor: localEntryType.colorValue == 0 ? Theme.of(context).primaryColor : Color(localEntryType.colorValue),
+              onColorChanged: (selectedColor) => setState(() {
+                localEntryType.colorValue = selectedColor.value;
+              }),
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(child: const Text('Selecionar'), onPressed: () => Navigator.of(context).pop()),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FinModalScafold(
+    return CustomModalScafold(
       title: 'Tipo lançamento',
       body: SingleChildScrollView(
         child: Form(
@@ -223,27 +244,5 @@ class _EntryTypeFormState extends State<EntryTypeForm> {
         ),
       ),
     );
-  }
-
-  Future<dynamic> _showCollorPicker(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Selecione a cor tipo de lançamento'),
-            content: SingleChildScrollView(
-              child: BlockPicker(
-                pickerColor:
-                    localEntryType.colorValue == 0 ? Theme.of(context).primaryColor : Color(localEntryType.colorValue),
-                onColorChanged: (selectedColor) => setState(() {
-                  localEntryType.colorValue = selectedColor.value;
-                }),
-              ),
-            ),
-            actions: <Widget>[
-              ElevatedButton(child: const Text('Selecionar'), onPressed: () => Navigator.of(context).pop()),
-            ],
-          );
-        });
   }
 }

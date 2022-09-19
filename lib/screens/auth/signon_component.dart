@@ -3,7 +3,7 @@ import 'package:fin/components/util/custom_dialog.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
 import 'package:fin/controllers/auth_controller.dart';
-import 'package:fin/fin_routes.dart';
+import 'package:fin/routes.dart';
 import 'package:fin/screens/auth/auth_screen.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -57,7 +57,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
             // ignore: use_build_context_synchronously
             Navigator.restorablePushNamedAndRemoveUntil(
               context,
-              FinRoutes.landingScreen,
+              Routes.landingScreen,
               (route) => false,
             );
             CustomMessage(
@@ -92,7 +92,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
               // ignore: use_build_context_synchronously
               Navigator.restorablePushNamedAndRemoveUntil(
                 context,
-                FinRoutes.landingScreen,
+                Routes.landingScreen,
                 (route) => false,
               );
             }
@@ -257,7 +257,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
                         onPressed: () {
                           if (widget.screenMode == Mode.newUser) {
                             Navigator.of(context).pushNamed(
-                              FinRoutes.authScreen,
+                              Routes.authScreen,
                               arguments: ScreenMode.signIn,
                             );
                           } else {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class FinModalScafold extends StatelessWidget {
+class CustomModalScafold extends StatelessWidget {
   final Widget body;
   final String title;
 
-  const FinModalScafold({
+  const CustomModalScafold({
     Key? key,
     this.title = '',
     required this.body,

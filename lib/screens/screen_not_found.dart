@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../fin_routes.dart';
+import '../routes.dart';
 
 class ScreenNotFound extends StatelessWidget {
   final String screenName;
@@ -41,7 +41,7 @@ class ScreenNotFound extends StatelessWidget {
           // limpa a stak de telas e chama a tela inicial
           Navigator.restorablePushNamedAndRemoveUntil(
             context,
-            FinRoutes.mainScreen,
+            Routes.mainScreen,
             (route) => false,
           );
         },

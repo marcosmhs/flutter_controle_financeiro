@@ -1,8 +1,9 @@
+import 'package:fin/screens/sell_items/sell_items_screen.dart';
 import 'package:flutter/material.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
-import 'package:fin/fin_routes.dart';
+import 'package:fin/routes.dart';
 import 'package:fin/my_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -16,7 +17,6 @@ import 'package:fin/screens/screen_not_found.dart';
 import 'package:fin/screens/auth/auth_screen.dart';
 import 'package:fin/screens/auth/user_data_screen.dart';
 import 'package:fin/screens/entrytype/entrytype_screen.dart';
-
 
 void main() async {
   runApp(const MyApp());
@@ -72,13 +72,14 @@ class _MyAppState extends State<MyApp> {
         title: 'Fin',
         theme: MyTheme.theme,
         routes: {
-          FinRoutes.landingScreen: (ctx) => const LandingScreen(),
-          FinRoutes.authScreen: (ctx) => const AuthScreen(screenMode: ScreenMode.signIn),
-          FinRoutes.mainScreen: (ctx) => const MainScreen(),
-          FinRoutes.userDataScreen: (ctx) => const UserDataScreen(),
-          FinRoutes.entryTypeScreen: (ctx) => const EntryTypeScreen(),
+          Routes.landingScreen: (ctx) => const LandingScreen(),
+          Routes.authScreen: (ctx) => const AuthScreen(screenMode: ScreenMode.signIn),
+          Routes.mainScreen: (ctx) => const MainScreen(),
+          Routes.userDataScreen: (ctx) => const UserDataScreen(),
+          Routes.entryTypeScreen: (ctx) => const EntryTypeScreen(),
+          Routes.sellItemsScreen: (ctx) => const SellItemsScreen(),
         },
-        initialRoute: FinRoutes.landingScreen,
+        initialRoute: Routes.landingScreen,
         // Executado quando uma tela não é encontrada
         onUnknownRoute: (settings) {
           return MaterialPageRoute(builder: (_) {

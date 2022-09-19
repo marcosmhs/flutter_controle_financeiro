@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:fin/routes.dart';
 import 'package:fin/controllers/auth_controller.dart';
 
-class FinDrawer extends StatelessWidget {
-  const FinDrawer({Key? key}) : super(key: key);
+class YouStoreDrawer extends StatelessWidget {
+  const YouStoreDrawer({
+    Key? key,
+  }) : super(key: key);
 
   Column _option({
     required BuildContext context,
@@ -39,15 +41,15 @@ class FinDrawer extends StatelessWidget {
       child: Column(
         children: [
           AppBar(
-            title: const Text('Menu'),
+            title: const Text('You Store Menu'),
             // remove o botão do drawer quando ele está aberto
             automaticallyImplyLeading: true,
           ),
           _option(
             context: context,
-            icon: const Icon(Icons.type_specimen),
-            text: 'Tipo de lançamento',
-            defaultRoute: Routes.entryTypeScreen,
+            icon: const Icon(Icons.sell),
+            text: 'Anunciar um produto',
+            defaultRoute: Routes.sellItemsScreen,
           ),
           const Spacer(),
           _option(
@@ -55,13 +57,6 @@ class FinDrawer extends StatelessWidget {
             icon: const Icon(Icons.settings),
             text: 'Configurações',
             defaultRoute: Routes.configScreen,
-          ),
-          const Divider(),
-          _option(
-            context: context,
-            icon: const Icon(Icons.sync),
-            text: 'Sincronização de dados',
-            defaultRoute: Routes.syncScreen,
           ),
           const Divider(),
           _option(

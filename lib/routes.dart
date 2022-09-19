@@ -1,4 +1,4 @@
-class FinRoutes {
+class Routes {
   static const landingScreen = '/';
   static const mainScreen = '/screens/main_screen';
   static const authScreen = '/screens/auth/auth_screen';
@@ -6,4 +6,5 @@ class FinRoutes {
   static const entryTypeScreen = '/screens/entrytype/entry_type_screen';
   static const syncScreen = '/screens/config/sync_screen';
   static const configScreen = '/screens/config/config_screen';
+  static const sellItemsScreen = '/screens/sell_items_screen';
 }

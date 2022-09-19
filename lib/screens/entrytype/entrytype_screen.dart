@@ -1,4 +1,4 @@
-import 'package:fin/components/fin_scafold.dart';
+import 'package:fin/components/util/custom_scafold.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
 import 'package:fin/controllers/entrytype_controller.dart';
@@ -20,12 +20,12 @@ class _EntryTypeScreenState extends State<EntryTypeScreen> {
   bool _isLoading = false;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     _reloadEntryType();
   }
 
-  _reloadEntryType() async {
+  void _reloadEntryType() async {
     setState(() => _isLoading = true);
     try {
       CustomReturn retorno = await Provider.of<EntryTypeController>(context, listen: false).loadEntryTypeList();
@@ -37,7 +37,7 @@ class _EntryTypeScreenState extends State<EntryTypeScreen> {
     }
   }
 
-  _openModalForm(BuildContext context) {
+  void _openModalForm(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
       builder: (_) {
@@ -49,7 +49,7 @@ class _EntryTypeScreenState extends State<EntryTypeScreen> {
   @override
   Widget build(BuildContext context) {
     var entryTypeList = Provider.of<EntryTypeController>(context, listen: true).entryTypeList;
-    return FinScafold(
+    return CustomScafold(
       title: 'Tipos de lançamento',
       showAppDrawer: false,
       appBarActions: [

@@ -10,24 +10,27 @@ import 'package:fin/data/firebase_consts.dart';
 import 'package:fin/controllers/sharedpreferences_controller.dart';
 
 class AuthData {
-  late String _token;
-  late String _email;
+  late String? _token;
+  late String? _email;
   late String _userId;
   late String _name;
+  late bool _admin;
   late DateTime? _expirationDatetime;
 
   AuthData({
-    required String email,
-    required String userId,
-    required String name,
+    String email = '',
+    String userId = '',
+    String name = '',
     DateTime? expirationDatetime,
-    required String token,
+    String token = '',
+    bool admin = false,
   }) {
     _token = token;
     _email = email;
     _userId = userId;
     _name = name;
     _expirationDatetime = expirationDatetime;
+    _admin = admin;
   }
 
   static AuthData emptyData() {
@@ -36,6 +39,10 @@ class AuthData {
 
   bool get isAuthenticated {
     return (_expirationDatetime?.isAfter(DateTime.now()) ?? false) && _token != '';
+  }
+
+  bool get admin {
+    return isAuthenticated ? _admin : false;
   }
 
   String? get token {
@@ -107,12 +114,11 @@ class AuthController with ChangeNotifier {
     );
 
     _currentUserData = AuthData(
-      email: body['email'],
-      userId: body['localId'],
-      name: userDataResponse.body == 'null' ? {} : jsonDecode(userDataResponse.body)['name'],
-      expirationDatetime: DateTime.now().add(Duration(seconds: int.tryParse(body['expiresIn']) ?? 0)),
-      token: body['idToken'],
-    );
+        email: body['email'],
+        userId: body['localId'],
+        name: userDataResponse.body == 'null' ? {} : jsonDecode(userDataResponse.body)['name'],
+        expirationDatetime: DateTime.now().add(Duration(seconds: int.tryParse(body['expiresIn']) ?? 0)),
+        token: body['idToken']);
 
     if (saveLogin) {
       SharedPreferencesController.saveMap(key: 'authLoginPassword', map: {
@@ -126,7 +132,7 @@ class AuthController with ChangeNotifier {
           'userId': _currentUserData.userId,
           'name': _currentUserData.name,
           'expirationDatetime': _currentUserData.expirationDatetime!.toIso8601String(),
-          'token': _currentUserData.token,
+          'token': _currentUserData.token
         },
       );
     }
@@ -179,9 +185,7 @@ class AuthController with ChangeNotifier {
       // http.post
       Uri.parse('${FirebaseConsts.finUserData}/${body['localId']}.json/?auth=${body['idToken']}'),
       // Id fica em branco pois será gerado no banco
-      body: jsonEncode({
-        'name': name,
-      }),
+      body: jsonEncode({'name': name}),
     );
 
     if (responseUser.statusCode >= 400) {

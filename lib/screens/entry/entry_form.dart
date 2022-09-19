@@ -1,5 +1,6 @@
-//import 'package:fin/components/fin_modalscafold.dart';
-import 'package:fin/components/fin_scafold.dart';
+//import 'package:fin/components/fin_CustomModalScafold.dart';
+import 'package:fin/components/fin_drawer.dart';
+import 'package:fin/components/util/custom_scafold.dart';
 import 'package:fin/components/util/custom_datetimeselector.dart';
 import 'package:fin/components/util/custom_dialog.dart';
 import 'package:fin/components/util/custom_return.dart';
@@ -364,7 +365,8 @@ class _EntryFormState extends State<EntryForm> with SingleTickerProviderStateMix
     if (widget.entry != null && widget.entry!.payedValue != 0) {
       _loadEntryPaymentList(entryId: widget.entry!.id);
     }
-    return FinScafold(
+    return CustomScafold(
+      drawer: const FinDrawer(),
       title: widget.entry != null && widget.entry!.id != '' ? 'Alterar' : 'Novo lançamento',
       body: SizedBox(
         height: MediaQuery.of(context).size.height * 0.9,
