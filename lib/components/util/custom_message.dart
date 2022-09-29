@@ -7,6 +7,18 @@ enum MessageType { info, sucess, error }
 enum ModelType { dialog, toast, snackbar }
 
 class CustomMessage {
+  static CustomMessage error(BuildContext context, {required String message}) {
+    return CustomMessage(context: context, messageText: message, messageType: MessageType.error);
+  }
+
+  static CustomMessage sucess(BuildContext context, {required String message}) {
+    return CustomMessage(context: context, messageText: message, messageType: MessageType.sucess);
+  }
+
+  static CustomMessage errorToast(BuildContext context, {required String message}) {
+    return CustomMessage(context: context, messageText: message, messageType: MessageType.error, modelType: ModelType.snackbar);
+  }
+
   CustomMessage({
     ModelType modelType = ModelType.snackbar,
     required BuildContext context,

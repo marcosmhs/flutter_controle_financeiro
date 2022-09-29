@@ -5,12 +5,12 @@ import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
 import 'package:fin/controllers/entry_controller.dart';
 import 'package:fin/models/entry.dart';
-import 'package:fin/screens/entry/entry_card.dart';
-import 'package:fin/screens/entry/entry_form.dart';
+import 'package:fin/screens/fin/entry/entry_card.dart';
+import 'package:fin/screens/fin/entry/entry_form.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 // ignore: depend_on_referenced_packages
-import '../components/util/custom_scafold.dart';
+import '../../components/util/custom_scafold.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 

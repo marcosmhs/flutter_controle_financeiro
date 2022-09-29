@@ -1,7 +1,7 @@
 import 'package:fin/components/util/custom_dialog.dart';
 import 'package:fin/models/entry.dart';
-import 'package:fin/screens/entry/entry_form.dart';
-import 'package:fin/screens/entry/entry_pay_component.dart';
+import 'package:fin/screens/fin/entry/entry_form.dart';
+import 'package:fin/screens/fin/entry/entry_pay_component.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';

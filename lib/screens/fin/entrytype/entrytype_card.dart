@@ -5,7 +5,7 @@ import 'package:fin/controllers/entrytype_controller.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:fin/models/entry.dart';
-import 'package:fin/screens/entrytype/entrytype_form.dart';
+import 'package:fin/screens/fin/entrytype/entrytype_form.dart';
 import 'package:flutter/material.dart';
 
 enum ScreenMode { form, list, showItem }

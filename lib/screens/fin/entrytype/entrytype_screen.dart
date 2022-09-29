@@ -2,8 +2,8 @@ import 'package:fin/components/util/custom_scafold.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
 import 'package:fin/controllers/entrytype_controller.dart';
-import 'package:fin/screens/entrytype/entrytype_form.dart';
-import 'package:fin/screens/entrytype/entrytype_card.dart';
+import 'package:fin/screens/fin/entrytype/entrytype_form.dart';
+import 'package:fin/screens/fin/entrytype/entrytype_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages

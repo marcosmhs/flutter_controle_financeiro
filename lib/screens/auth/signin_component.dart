@@ -1,6 +1,7 @@
 import 'package:fin/components/util/custom_textFormField.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
+import 'package:fin/models/user.dart';
 import 'package:flutter/material.dart';
 
 // ignore: depend_on_referenced_packages
@@ -41,7 +42,13 @@ class _SignInComponentState extends State<SignInComponent> {
       AuthController authController = Provider.of(context, listen: false);
       CustomReturn retorno;
       try {
-        retorno = await authController.signIn(email: _email, password: _password, saveLogin: _saveLogin);
+        User user = User();
+        user.email = _email;
+        user.password = _password;
+        retorno = await authController.signIn(
+          user: user,
+          saveLogin: _saveLogin,
+        );
         if (retorno.returnType == ReturnType.sucess) {
           // ignore: use_build_context_synchronously
           Navigator.restorablePushNamedAndRemoveUntil(

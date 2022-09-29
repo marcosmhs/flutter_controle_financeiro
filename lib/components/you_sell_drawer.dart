@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:fin/routes.dart';
 import 'package:fin/controllers/auth_controller.dart';
 
-class YouStoreDrawer extends StatelessWidget {
-  const YouStoreDrawer({
+class YouSellDrawer extends StatelessWidget {
+  const YouSellDrawer({
     Key? key,
   }) : super(key: key);
 
@@ -45,11 +45,32 @@ class YouStoreDrawer extends StatelessWidget {
             // remove o botão do drawer quando ele está aberto
             automaticallyImplyLeading: true,
           ),
+          if (Provider.of<AuthController>(context).currentUser.isAdmin)
+            _option(
+              context: context,
+              icon: const Icon(Icons.category),
+              text: 'Categorias',
+              defaultRoute: Routes.categoryScreen,
+            ),
+          if (Provider.of<AuthController>(context).currentUser.isAdmin)
+            _option(
+              context: context,
+              icon: const Icon(Icons.category_outlined),
+              text: 'SubCategorias',
+              defaultRoute: Routes.subCategoryScreen,
+            ),
+          if (Provider.of<AuthController>(context).currentUser.isAdmin)
+            _option(
+              context: context,
+              icon: const Icon(Icons.check_box),
+              text: 'Liberação de anúncios',
+              defaultRoute: Routes.offersEvaluationScreen,
+            ),
           _option(
             context: context,
             icon: const Icon(Icons.sell),
             text: 'Anunciar um produto',
-            defaultRoute: Routes.sellItemsScreen,
+            defaultRoute: Routes.offersScreen,
           ),
           const Spacer(),
           _option(

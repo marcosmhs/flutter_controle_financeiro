@@ -1,5 +1,5 @@
-import 'package:fin/screens/fin_screen.dart';
-import 'package:fin/screens/you_store_screen.dart';
+import 'package:fin/screens/fin/fin_screen.dart';
+import 'package:fin/screens/you_sell/you_sell_screen.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import '../components/util/custom_scafold.dart';
@@ -25,7 +25,7 @@ class _MainScreen extends State<MainScreen> {
     return CustomScafold(
       showAppBar: false,
       body: Center(
-        child: _selectedIndex == 0 ? const FinScreen() : const YouStoreScreen(),
+        child: _selectedIndex == 0 ? const FinScreen() : const YouSellScreen(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -35,7 +35,7 @@ class _MainScreen extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: 'You Store',
+            label: 'You Sell',
           ),
         ],
         currentIndex: _selectedIndex,

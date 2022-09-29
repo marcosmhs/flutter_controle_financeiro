@@ -20,6 +20,8 @@ class CustomTextEdit extends StatefulWidget {
   final void Function(String?)? onChanged;
   final InputBorder? border;
   final void Function()? onTap;
+  final int maxLines;
+  final int? minLength;
 
   const CustomTextEdit({
     Key? key,
@@ -31,6 +33,8 @@ class CustomTextEdit extends StatefulWidget {
     this.isPassword = false,
     this.inicialValue,
     this.textInputAction = TextInputAction.next,
+    this.maxLines = 1,
+    this.minLength,
     this.fillColor,
     this.keyboardType,
     this.nextFocusNode,
@@ -72,6 +76,8 @@ class _CustomTextEditState extends State<CustomTextEdit> {
             focusNode: widget.focusNode,
             validator: widget.validator,
             controller: widget.controller,
+            maxLines: widget.maxLines,
+            maxLength: widget.minLength,
             decoration: InputDecoration(
               filled: true,
               fillColor: widget.fillColor ?? Theme.of(context).backgroundColor,

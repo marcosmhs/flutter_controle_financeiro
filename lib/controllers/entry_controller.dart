@@ -3,10 +3,10 @@ import 'dart:core';
 
 import 'package:fin/components/util/custom_dropbox.dart';
 import 'package:fin/components/util/custom_return.dart';
-import 'package:fin/controllers/auth_controller.dart';
 import 'package:fin/controllers/entrytype_controller.dart';
 import 'package:fin/data/firebase_consts.dart';
 import 'package:fin/models/entry.dart';
+import 'package:fin/models/user.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EntryController with ChangeNotifier {
-  final AuthData currentUserData;
+  final User currentUser;
   final List<Entry> _entryList;
   final List<EntryPayment> _entryPaymentList = [];
 
-  EntryController(this.currentUserData, this._entryList);
+  EntryController(this.currentUser, this._entryList);
 
   List<Entry> get entryList => [..._entryList];
 
@@ -135,7 +135,7 @@ class EntryController with ChangeNotifier {
     // http.patch
     final response = await patch(
       Uri.parse(
-        '${FirebaseConsts.entry}/${currentUserData.userId}/${entry.id}.json?auth=${currentUserData.token}',
+        '${FirebaseConsts.entry}/${currentUser.userId}/${entry.id}.json?auth=${currentUser.token}',
       ),
       body: jsonEncode({
         'description': entry.description,
@@ -147,7 +147,7 @@ class EntryController with ChangeNotifier {
       }),
     );
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       _entryList[index] = entry;
       // retorna à todos os que estão ouvindo esta classe sejam notificados
@@ -179,7 +179,7 @@ class EntryController with ChangeNotifier {
       expiratioDate = expiratioDate?.add(Duration(days: 30 * x - 1));
       final response = await post(
         // http.post
-        Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+        Uri.parse('${FirebaseConsts.entry}/${currentUser.userId}.json?auth=${currentUser.token}'),
         // Id fica em branco pois será gerado no banco
         body: jsonEncode({
           'description': '${entry.description} ${installmentQuantity == 1 ? '' : "$x / $installmentQuantity"}',
@@ -193,7 +193,7 @@ class EntryController with ChangeNotifier {
       );
 
       if (response.statusCode >= 400) {
-        return CustomReturn.httpError(errorCode: response.statusCode);
+        return CustomReturn.httpResponseError(response: response)!;
       } else {
         String id = jsonDecode(response.body)['name'];
         if (id.isEmpty) {
@@ -220,11 +220,11 @@ class EntryController with ChangeNotifier {
 
     final response = await delete(
       // http.delete
-      Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}/${entry.id}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entry}/${currentUser.userId}/${entry.id}.json?auth=${currentUser.token}'),
     );
 
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       _entryList.removeWhere((e) => e.id == entry.id);
       loadEntryList();
@@ -236,7 +236,7 @@ class EntryController with ChangeNotifier {
 
   Future<CustomReturn> loadEntryList() async {
     final response = await get(
-      Uri.parse('${FirebaseConsts.entry}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entry}/${currentUser.userId}.json?auth=${currentUser.token}'),
     );
 
     if (response.body == 'null') {
@@ -246,11 +246,11 @@ class EntryController with ChangeNotifier {
         return CustomReturn.unauthorizedError;
       } else {
         if (response.statusCode > 400) {
-          return CustomReturn.httpError(errorCode: response.statusCode);
+          return CustomReturn.httpResponseError(response: response)!;
         } else {
           Map<String, dynamic> data = jsonDecode(response.body);
           _entryList.clear();
-          EntryTypeController entryTypeController = EntryTypeController(currentUserData, []);
+          EntryTypeController entryTypeController = EntryTypeController(currentUser, []);
           await entryTypeController.loadEntryTypeList();
           await loadEntryListPayment();
 
@@ -281,7 +281,7 @@ class EntryController with ChangeNotifier {
     CustomReturn customReturn = CustomReturn.sucess;
     final response = await post(
       // http.post
-      Uri.parse('${FirebaseConsts.entryInstallment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryInstallment}/${currentUser.userId}.json?auth=${currentUser.token}'),
       // Id fica em branco pois será gerado no banco
       body: jsonEncode({
         'installmentQuantity': entryInstallment.installmentQuantity,
@@ -290,7 +290,7 @@ class EntryController with ChangeNotifier {
     );
 
     if (response.statusCode >= 400) {
-      customReturn = CustomReturn.httpError(errorCode: response.statusCode);
+      customReturn = CustomReturn.httpResponseError(response: response)!;
     } else {
       String id = jsonDecode(response.body)['name'];
       if (id.isEmpty) {
@@ -308,7 +308,7 @@ class EntryController with ChangeNotifier {
   Future<CustomReturn> registerPayment({required EntryPayment entryPayment}) async {
     final response = await post(
       // http.post
-      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryPayment}/${currentUser.userId}.json?auth=${currentUser.token}'),
       // Id fica em branco pois será gerado no banco
       body: jsonEncode({
         'date': entryPayment.date.toIso8601String(),
@@ -318,7 +318,7 @@ class EntryController with ChangeNotifier {
     );
 
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     }
 
     String id = jsonDecode(response.body)['name'];
@@ -337,11 +337,11 @@ class EntryController with ChangeNotifier {
 
     final response = await delete(
       // http.delete
-      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}/${entryPayment.id}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryPayment}/${currentUser.userId}/${entryPayment.id}.json?auth=${currentUser.token}'),
     );
 
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       _entryPaymentList.removeWhere((e) => e.id == entryPayment.id);
       // retorna à todos os que estão ouvindo esta classe sejam notificados
@@ -352,16 +352,12 @@ class EntryController with ChangeNotifier {
 
   Future<CustomReturn> loadEntryListPayment() async {
     final response = await get(
-      Uri.parse('${FirebaseConsts.entryPayment}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryPayment}/${currentUser.userId}.json?auth=${currentUser.token}'),
     );
-    if (response.body == 'null') {
-      return CustomReturn(returnType: ReturnType.error, message: 'Erro ao obter pagamentos');
-    }
-    if (response.statusCode == 401) {
-      return CustomReturn.unauthorizedError;
-    }
-    if (response.statusCode > 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+
+    var retorno = CustomReturn.httpResponseError(response: response);
+    if (retorno != null) {
+      return retorno;
     }
 
     Map<String, dynamic> data = jsonDecode(response.body);

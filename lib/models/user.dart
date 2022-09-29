@@ -1,27 +1,23 @@
-class FirebaseUser {
+class User {
   late String userId;
   late String email;
   late String password;
   late String token;
-  late DateTime? expirationDatetime;
+  //late DateTime? expirationDatetime;
+  late String name;
+  late bool isAdmin;
 
-  FirebaseUser({
+  User({
     this.userId = '',
     this.email = '',
     this.password = '',
-    this.expirationDatetime,
     this.token = '',
+    //this.expirationDatetime,
+    this.name = '',
+    this.isAdmin = false,
   });
 
-  bool get isAuthenticated {
-    return (expirationDatetime?.isAfter(DateTime.now()) ?? false) && token != '';
-  }
+  //bool get isAuthenticated {
+  //  return (expirationDatetime?.isAfter(DateTime.now()) ?? false) && token != '';
+  //}
 }
-
-class LocalUser {
-  late String localId;
-  late String name;
-  late bool isAdmin;
-}
-
-class User extends FirebaseUser with LocalUser {}

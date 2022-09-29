@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "521918699474",
+    "firebase_url": "https://redfive-fin-default-rtdb.firebaseio.com",
+    "project_id": "redfive-fin",
+    "storage_bucket": "redfive-fin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521918699474:android:6537784f05297865eb9a0b",
+        "android_client_info": {
+          "package_name": "br.com.redfive.fin.fin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521918699474-kpq4ruh2skn5u8lkkte33hir1d531cut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEMo0i73MfhoKL9JjPLzOwn5xwFvdTUkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521918699474-kpq4ruh2skn5u8lkkte33hir1d531cut.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "521918699474-st8d0m4d69stbc2hprmqmmb3e1k1didi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.redfive.fin.fin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

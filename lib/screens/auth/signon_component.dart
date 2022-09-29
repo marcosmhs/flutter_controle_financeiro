@@ -3,6 +3,7 @@ import 'package:fin/components/util/custom_dialog.dart';
 import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_message.dart';
 import 'package:fin/controllers/auth_controller.dart';
+import 'package:fin/models/user.dart';
 import 'package:fin/routes.dart';
 import 'package:fin/screens/auth/auth_screen.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +29,9 @@ class _SignOnComponentState extends State<SignOnComponent> {
   final FocusNode _confirmPasswordFocus = FocusNode();
   final FocusNode _nameFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
+  User _localUser = User();
   bool _isLoading = false;
   bool _changeEmail = false;
-
-  final Map<String, String> _formData = {
-    'email': '',
-    'password': '',
-    'name': '',
-  };
 
   void _submit() async {
     setState(() => _isLoading = true);
@@ -49,9 +45,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
       try {
         if (widget.screenMode == Mode.newUser) {
           retorno = await authController.signUp(
-            email: _formData['email']!,
-            password: _formData['password']!,
-            name: _formData['name']!,
+            user: _localUser,
           );
           if (retorno.returnType == ReturnType.sucess) {
             // ignore: use_build_context_synchronously
@@ -69,9 +63,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
         } else {
           retorno = await authController.editUserData(
             changeEmail: _changeEmail,
-            email: _formData['email']!,
-            password: _formData['password']!,
-            name: _formData['name']!,
+            userData: _localUser,
           );
           if (retorno.returnType == ReturnType.sucess) {
             // ignore: use_build_context_synchronously
@@ -83,9 +75,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
             );
             if (!_changeEmail) {
               // ignore: use_build_context_synchronously
-              Navigator.of(context).pop(); // fecha a tela
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop(); // fecha o drawer
+              Navigator.of(context).pop();
             } else {
               // ignore: use_build_context_synchronously
               Provider.of<AuthController>(context, listen: false).logout();
@@ -116,9 +106,9 @@ class _SignOnComponentState extends State<SignOnComponent> {
   @override
   Widget build(BuildContext context) {
     if (widget.screenMode == Mode.editData) {
-      var authData = Provider.of<AuthController>(context, listen: false).currentUserData;
-      _emailController.text = authData.email ?? '';
-      _nameController.text = authData.name ?? '';
+      _localUser = Provider.of<AuthController>(context, listen: false).currentUser;
+      _emailController.text = _localUser.email;
+      _nameController.text = _localUser.name;
     }
 
     return SingleChildScrollView(
@@ -127,8 +117,18 @@ class _SignOnComponentState extends State<SignOnComponent> {
         child: Column(
           children: [
             if (widget.screenMode == Mode.newUser) const SizedBox(height: 10),
-            if (widget.screenMode == Mode.newUser)
-              const Text('Fin', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+            if (widget.screenMode == Mode.newUser) const Text('Fin', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+
+            // aparece apenas quando é adm
+            if (widget.screenMode == Mode.editData && _localUser.isAdmin) const SizedBox(height: 10),
+            if (widget.screenMode == Mode.editData && _localUser.isAdmin)
+              Text(
+                'System admnistrador',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            if (widget.screenMode == Mode.editData && _localUser.isAdmin) const SizedBox(height: 10),
+
+            // check de alteração da senha
             if (widget.screenMode == Mode.editData)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +156,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
               controller: _emailController,
               labelText: 'E-mail',
               hintText: 'Informe seu e-mail',
-              onSave: (value) => _formData['email'] = value ?? '',
+              onSave: (value) => _localUser.email = value ?? '',
               prefixIcon: Icons.mail,
               keyboardType: TextInputType.emailAddress,
               nextFocusNode: _passwordFocus,
@@ -174,7 +174,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
               labelText: 'Senha',
               hintText: 'Informe sua senha',
               isPassword: true,
-              onSave: (value) => _formData['password'] = value ?? '',
+              onSave: (value) => _localUser.password = value ?? '',
               prefixIcon: Icons.lock,
               textInputAction: TextInputAction.next,
               focusNode: _passwordFocus,
@@ -228,7 +228,7 @@ class _SignOnComponentState extends State<SignOnComponent> {
               controller: _nameController,
               labelText: 'Nome',
               hintText: 'Informe seu nome completo',
-              onSave: (value) => _formData['name'] = value ?? '',
+              onSave: (value) => _localUser.name = value ?? '',
               prefixIcon: Icons.person,
               textInputAction: TextInputAction.next,
               focusNode: _nameFocus,

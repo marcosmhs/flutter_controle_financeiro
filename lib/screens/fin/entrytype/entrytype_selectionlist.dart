@@ -1,5 +1,5 @@
 import 'package:fin/controllers/entrytype_controller.dart';
-import 'package:fin/screens/entrytype/entrytype_card.dart';
+import 'package:fin/screens/fin/entrytype/entrytype_card.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';

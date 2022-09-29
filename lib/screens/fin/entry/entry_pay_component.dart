@@ -4,7 +4,7 @@ import 'package:fin/components/util/custom_return.dart';
 import 'package:fin/components/util/custom_textFormField.dart';
 import 'package:fin/controllers/entry_controller.dart';
 import 'package:fin/models/entry.dart';
-import 'package:fin/screens/entry/entry_card.dart';
+import 'package:fin/screens/fin/entry/entry_card.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';

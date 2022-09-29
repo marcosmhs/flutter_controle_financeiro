@@ -25,4 +25,16 @@ class FirebaseConsts {
   static String get entryPayment {
     return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/entryPayment';
   }
+
+  static String get category {
+    return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/category';
+  }
+
+  static String get subCategory {
+    return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/subCategory';
+  }
+
+  static String get offer {
+    return 'https://${FirebaseConsts.firebaseProject}-default-rtdb.firebaseio.com/offer';
+  }
 }

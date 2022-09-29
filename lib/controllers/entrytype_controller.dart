@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'package:fin/components/util/custom_return.dart';
-import 'package:fin/controllers/auth_controller.dart';
 import 'package:fin/data/firebase_consts.dart';
 import 'package:fin/models/entry.dart';
+import 'package:fin/models/user.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 
 class EntryTypeController with ChangeNotifier {
-  final AuthData currentUserData;
+  final User currentUser;
   final List<EntryType> _entryTypeList;
 
-  EntryTypeController(this.currentUserData, this._entryTypeList);
+  EntryTypeController(this.currentUser, this._entryTypeList);
 
   List<EntryType> get entryTypeList => [..._entryTypeList];
 
@@ -33,7 +33,7 @@ class EntryTypeController with ChangeNotifier {
     // http.patch
     final response = await patch(
       Uri.parse(
-        '${FirebaseConsts.entryType}/${currentUserData.userId}/${entryType.id}.json?auth=${currentUserData.token}',
+        '${FirebaseConsts.entryType}/${currentUser.userId}/${entryType.id}.json?auth=${currentUser.token}',
       ),
       body: jsonEncode({
         'type': entryType.type,
@@ -44,7 +44,7 @@ class EntryTypeController with ChangeNotifier {
       }),
     );
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       _entryTypeList[index] = entryType;
       return CustomReturn.sucess;
@@ -58,10 +58,9 @@ class EntryTypeController with ChangeNotifier {
 
     final response = await post(
       // http.post
-      Uri.parse('${FirebaseConsts.entryType}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryType}/${currentUser.userId}.json?auth=${currentUser.token}'),
       // Id fica em branco pois será gerado no banco
       body: jsonEncode({
-        'id': entryType.id,
         'type': entryType.type,
         'name': entryType.name,
         'colorValue': entryType.colorValue,
@@ -70,7 +69,7 @@ class EntryTypeController with ChangeNotifier {
       }),
     );
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       String id = jsonDecode(response.body)['name'];
       if (id.isEmpty) {
@@ -97,14 +96,14 @@ class EntryTypeController with ChangeNotifier {
       return CustomReturn(returnType: ReturnType.error, message: 'Erro interno, tipo de lançamento não encontrado');
     }
 
-    String url = '${FirebaseConsts.entryType}/${currentUserData.userId}/${entryType.id}.json?auth=${currentUserData.token}';
+    String url = '${FirebaseConsts.entryType}/${currentUser.userId}/${entryType.id}.json?auth=${currentUser.token}';
     if (deleteAll) {
-      url = '${FirebaseConsts.entryType}/${currentUserData.userId}.json?auth=${currentUserData.token}';
+      url = '${FirebaseConsts.entryType}/${currentUser.userId}.json?auth=${currentUser.token}';
     }
     final response = await delete(Uri.parse(url));
 
     if (response.statusCode >= 400) {
-      return CustomReturn.httpError(errorCode: response.statusCode);
+      return CustomReturn.httpResponseError(response: response)!;
     } else {
       if (deleteAll) {
         _entryTypeList.clear();
@@ -119,13 +118,13 @@ class EntryTypeController with ChangeNotifier {
   Future<CustomReturn> loadEntryTypeList() async {
     // só deve fazer a requisição se estiver conectado
     final response = await get(
-      Uri.parse('${FirebaseConsts.entryType}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryType}/${currentUser.userId}.json?auth=${currentUser.token}'),
     );
     if (response.statusCode == 401) {
       return CustomReturn.unauthorizedError;
     } else {
       if (response.statusCode > 400) {
-        return CustomReturn.httpError(errorCode: response.statusCode);
+        return CustomReturn.httpResponseError(response: response)!;
       } else {
         if (response.body == 'null') {
           return CustomReturn(returnType: ReturnType.error, message: 'Sem retorno do Firebase');
@@ -152,7 +151,7 @@ class EntryTypeController with ChangeNotifier {
   Future<EntryType> entryTypeById({required String id}) async {
     EntryType entryType = EntryType();
     final response = await get(
-      Uri.parse('${FirebaseConsts.entryType}/${currentUserData.userId}/$id.json?auth=${currentUserData.token}'),
+      Uri.parse('${FirebaseConsts.entryType}/${currentUser.userId}/$id.json?auth=${currentUser.token}'),
     );
 
     Map<String, dynamic> data = jsonDecode(response.body);

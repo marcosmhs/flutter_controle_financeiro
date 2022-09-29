@@ -1,140 +1,76 @@
 import 'dart:async';
-import 'dart:convert';
 
 //import 'package:fin/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fin/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
-import 'package:http/http.dart';
 import 'package:fin/components/util/custom_return.dart';
-import 'package:fin/data/firebase_consts.dart';
 import 'package:fin/controllers/sharedpreferences_controller.dart';
 
-class AuthData {
-  late String? _token;
-  late String? _email;
-  late String _userId;
-  late String _name;
-  late bool _admin;
-  late DateTime? _expirationDatetime;
-
-  AuthData({
-    String email = '',
-    String userId = '',
-    String name = '',
-    DateTime? expirationDatetime,
-    String token = '',
-    bool admin = false,
-  }) {
-    _token = token;
-    _email = email;
-    _userId = userId;
-    _name = name;
-    _expirationDatetime = expirationDatetime;
-    _admin = admin;
-  }
-
-  static AuthData emptyData() {
-    return AuthData(email: '', userId: '', token: '', name: '');
-  }
-
-  bool get isAuthenticated {
-    return (_expirationDatetime?.isAfter(DateTime.now()) ?? false) && _token != '';
-  }
-
-  bool get admin {
-    return isAuthenticated ? _admin : false;
-  }
-
-  String? get token {
-    return isAuthenticated ? _token : '';
-  }
-
-  String? get email {
-    return isAuthenticated ? _email : '';
-  }
-
-  String? get userId {
-    return isAuthenticated ? _userId : '';
-  }
-
-  String? get name {
-    return isAuthenticated ? _name : '';
-  }
-
-  DateTime? get expirationDatetime {
-    return isAuthenticated ? _expirationDatetime : null;
-  }
-}
-
 class AuthController with ChangeNotifier {
-  late AuthData _currentUserData = AuthData.emptyData();
+  late User _currentUser;
 
-  AuthData get currentUserData {
-    return _currentUserData;
+  AuthController() {
+    _currentUser = User();
   }
 
-  void logout() {
-    _currentUserData = AuthData.emptyData();
-    SharedPreferencesController.removeValue(key: 'authLoginPassword').then((value) {
-      SharedPreferencesController.removeValue(key: 'authData').then((_) {
-        notifyListeners();
-      });
-    });
+  User get currentUser {
+    return _currentUser;
   }
 
-  // este método centraliza a conexão com o firebase, alternando o trecho que representa o serviço acessado
-  Future<Response> _connectFirebase({required String email, required String password, required String service}) async {
-    final url = FirebaseConsts.userManagemantUrl(service);
-    return await post(
-      Uri.parse(url),
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'returnSecureToken': true,
-      }),
-    );
+  void logout() async {
+    _currentUser = User();
+    await SharedPreferencesController.removeValue(key: 'authLoginPassword');
+    await SharedPreferencesController.removeValue(key: 'userData');
+    await fb_auth.FirebaseAuth.instance.signOut();
+    notifyListeners();
   }
 
-  Future<CustomReturn> signIn({required String email, required String password, bool saveLogin = false}) async {
-    final response = await _connectFirebase(email: email, password: password, service: 'signInWithPassword');
-
-    if (response.statusCode >= 400) {
-      if (response.statusCode == 404) {
-        return CustomReturn(returnType: ReturnType.error, message: 'O serviço de login não foi encontrado');
-      } else {
-        return CustomReturn.authSignUpError(jsonDecode(response.body)['error']['message']);
-      }
-    }
-
-    final body = jsonDecode(response.body);
-
-    final userDataResponse = await get(
-      //url/id_usuario/id_produto.json
-      Uri.parse('${FirebaseConsts.finUserData}/${body['localId']}.json?auth=${body['idToken']}'),
-    );
-
-    _currentUserData = AuthData(
-        email: body['email'],
-        userId: body['localId'],
-        name: userDataResponse.body == 'null' ? {} : jsonDecode(userDataResponse.body)['name'],
-        expirationDatetime: DateTime.now().add(Duration(seconds: int.tryParse(body['expiresIn']) ?? 0)),
-        token: body['idToken']);
-
-    if (saveLogin) {
-      SharedPreferencesController.saveMap(key: 'authLoginPassword', map: {
-        'email': email,
-        'pwd': password,
-      });
-      SharedPreferencesController.saveMap(
-        key: 'authData',
-        map: {
-          'email': _currentUserData.email,
-          'userId': _currentUserData.userId,
-          'name': _currentUserData.name,
-          'expirationDatetime': _currentUserData.expirationDatetime!.toIso8601String(),
-          'token': _currentUserData.token
-        },
+  Future<CustomReturn> signIn({required User user, bool saveLogin = false}) async {
+    try {
+      final credential = await fb_auth.FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: user.email,
+        password: user.password,
       );
+
+      if (credential.user != null) {
+        final userDataDb = await FirebaseFirestore.instance.collection('finUserData').doc(credential.user!.uid).get();
+        final userData = userDataDb.data();
+
+        if (userData != null) {
+          _currentUser = User(
+            email: credential.user!.email!,
+            userId: credential.user!.uid,
+            token: await credential.user!.getIdToken(),
+            name: userData['name'],
+            isAdmin: userData['isAdmin'],
+          );
+          notifyListeners();
+        }
+        if (saveLogin) {
+          await SharedPreferencesController.setMap(key: 'authLoginPassword', map: {
+            'email': user.email,
+            'pwd': user.password,
+          });
+
+          await SharedPreferencesController.setMap(
+            key: 'userData',
+            map: {
+              'email': currentUser.email,
+              'userId': currentUser.userId,
+              'name': currentUser.name,
+              'token': currentUser.token,
+              'isAdmin': currentUser.isAdmin.toString(),
+            },
+          );
+        }
+      }
+    } on fb_auth.FirebaseAuthException catch (e) {
+      return CustomReturn.authSignUpError(e.code);
+    } catch (e) {
+      return CustomReturn.error(e.toString());
     }
 
     notifyListeners();
@@ -143,127 +79,71 @@ class AuthController with ChangeNotifier {
 
   Future<void> tryAutoSignIn() async {
     // se já está autenticado não precisa logar novamente
-    if (!_currentUserData.isAuthenticated) {
-      final storedAuthData = await SharedPreferencesController.loadMap(key: 'authData');
+    if (!currentUser.email.isNotEmpty) {
+      final storedUserData = await SharedPreferencesController.getMap(key: 'userData');
       // se os dados estão salvos pode seguir
-      if (storedAuthData.isNotEmpty) {
-        final localExpiredDate = DateTime.parse(storedAuthData['expirationDatetime']);
+      if (storedUserData.isNotEmpty) {
+        //final localExpiredDate = DateTime.parse(storedUserData['expirationDatetime']);
         // se a data de expiração é anterior à data atual, ou seja, o login não está mais válido
-        if (localExpiredDate.isBefore(DateTime.now())) {
-          final authLoginPassword = await SharedPreferencesController.loadMap(key: 'authLoginPassword');
-          if (authLoginPassword.isNotEmpty) {
-            await signIn(email: authLoginPassword['email'], password: authLoginPassword['pwd'], saveLogin: true);
-          }
-        } else {
-          // recria o objeto de autenticação
-          _currentUserData = AuthData(
-            email: storedAuthData['email'],
-            userId: storedAuthData['userId'],
-            name: storedAuthData['name'],
-            expirationDatetime: localExpiredDate,
-            token: storedAuthData['token'],
+        //if (localExpiredDate.isBefore(DateTime.now())) {
+        final authLoginPassword = await SharedPreferencesController.getMap(key: 'authLoginPassword');
+
+        if (authLoginPassword.isNotEmpty) {
+          await signIn(
+            user: User(email: authLoginPassword['email'], password: authLoginPassword['pwd']),
+            saveLogin: true,
           );
         }
       }
     }
   }
 
-  Future<CustomReturn> signUp({required String email, required String password, required String name}) async {
-    final responseEmail = await _connectFirebase(email: email, password: password, service: 'signUp');
+  Future<CustomReturn> signUp({required User user}) async {
+    try {
+      final credential = await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: user.email,
+        password: user.password,
+      );
 
-    if (responseEmail.statusCode >= 400) {
-      if (responseEmail.statusCode == 404) {
-        return CustomReturn(returnType: ReturnType.error, message: 'O serviço de login não foi encontrado');
-      } else {
-        return CustomReturn.authSignUpError(jsonDecode(responseEmail.body)['error']['message']);
+      if (credential.user?.uid == null) {
+        await FirebaseFirestore.instance.collection('finUserData').doc(credential.user!.uid).set({
+          'name': user.name,
+          'idAdmin': user.isAdmin,
+        });
       }
+      return CustomReturn.sucess;
+    } on fb_auth.FirebaseException catch (e) {
+      return CustomReturn.error(e.code);
+    } catch (e) {
+      return CustomReturn.error(e.toString());
     }
-
-    final body = jsonDecode(responseEmail.body);
-
-    final responseUser = await put(
-      // http.post
-      Uri.parse('${FirebaseConsts.finUserData}/${body['localId']}.json/?auth=${body['idToken']}'),
-      // Id fica em branco pois será gerado no banco
-      body: jsonEncode({'name': name}),
-    );
-
-    if (responseUser.statusCode >= 400) {
-      if (responseUser.statusCode == 404) {
-        return CustomReturn(returnType: ReturnType.error, message: 'Erro ao gravar os dados do usuário');
-      } else {
-        return CustomReturn.authSignUpError(jsonDecode(responseUser.body)['error']['message']);
-      }
-    }
-
-    return CustomReturn.sucess;
   }
 
-  Future<CustomReturn> editUserData({
-    required bool changeEmail,
-    required String email,
-    String password = '',
-    required String name,
-  }) async {
-    final userManagemantUrl = FirebaseConsts.userManagemantUrl('update');
-    Response response;
-    if (changeEmail) {
-      response = await post(
-        Uri.parse(userManagemantUrl),
-        body: jsonEncode({
-          'idToken': _currentUserData._token,
-          'email': email,
-          'returnSecureToken': true,
-        }),
-      );
+  Future<CustomReturn> editUserData({required bool changeEmail, required User userData}) async {
+    try {
+      var user = fb_auth.FirebaseAuth.instance.currentUser;
+      if (changeEmail) {
+        await FirebaseFirestore.instance.collection('finUserData').doc(currentUser.userId).update({
+          'email': userData.email,
+        });
 
-      if (response.statusCode >= 400) {
-        if (response.statusCode == 404) {
-          return CustomReturn(returnType: ReturnType.error, message: 'Erro ao gravar os dados do usuário');
-        } else {
-          return CustomReturn.changeUserError(jsonDecode(response.body)['error']['message']);
-        }
+        await user!.updateEmail(userData.email);
+        currentUser.email = userData.email;
       }
-      // uma vez que não foram encontrados erros, podemos alterar os dados gerais
-      _currentUserData._email = email;
-    }
 
-    if (password != '') {
-      response = await post(
-        Uri.parse(userManagemantUrl),
-        body: jsonEncode({
-          'idToken': _currentUserData._token,
-          'password': password,
-          'returnSecureToken': true,
-        }),
-      );
+      await FirebaseFirestore.instance.collection('finUserData').doc(currentUser.userId).set({
+        'name': userData.name,
+        'isAdmin': currentUser.isAdmin,
+      });
+      currentUser.name = userData.name;
 
-      if (response.statusCode >= 400) {
-        if (response.statusCode == 404) {
-          return CustomReturn(returnType: ReturnType.error, message: 'Erro ao gravar os dados do usuário');
-        } else {
-          return CustomReturn.changeUserError(jsonDecode(response.body)['error']['message']);
-        }
+      if (userData.password != '') {
+        await fb_auth.FirebaseAuth.instance.currentUser!.updatePassword(userData.password);
       }
+      notifyListeners();
+      return CustomReturn.sucess;
+    } catch (e) {
+      return CustomReturn.error(e.toString());
     }
-
-    if (name != _currentUserData._name) {
-      final response = await put(
-        Uri.parse('${FirebaseConsts.finUserData}/${currentUserData.userId}.json?auth=${currentUserData.token}'),
-        body: jsonEncode({'name': name}),
-      );
-      if (response.statusCode >= 400) {
-        if (response.statusCode == 404) {
-          return CustomReturn(returnType: ReturnType.error, message: 'Erro ao gravar os dados do usuário');
-        } else {
-          return CustomReturn.authSignUpError(jsonDecode(response.body)['error']['message']);
-        }
-      }
-      // uma vez que não foram encontrados erros, podemos alterar os dados gerais
-      _currentUserData._name = name;
-    }
-
-    notifyListeners();
-    return CustomReturn.sucess;
   }
 }

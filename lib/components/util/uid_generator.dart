@@ -13,4 +13,8 @@ class UidGenerator {
   static String get firebaseLocalUid {
     return 'fb-local-${nanoid(13)}';
   }
+
+  static String get firestoreUid {
+    return 'firestore-uid-${nanoid(13)}';
+  }
 }

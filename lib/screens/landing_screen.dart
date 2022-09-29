@@ -9,7 +9,6 @@ class LandingScreen extends StatelessWidget {
   const LandingScreen({Key? key}) : super(key: key);
 
   Widget _autoLogin() {
-    
     return const AuthScreen(screenMode: ScreenMode.signIn);
   }
 
@@ -22,11 +21,25 @@ class LandingScreen extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.error != null) {
-          return const Center(child: Text('erro'));
+          return Scaffold(
+            body: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Fatal error!'),
+                  const SizedBox(height: 20),
+                  Text(
+                    snapshot.error.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+          );
         } else {
-          return authController.currentUserData.isAuthenticated == false
-              ? _autoLogin()
-              : const MainScreen();
+          return authController.currentUser.email == '' ? _autoLogin() : const MainScreen();
         }
       },
     );
